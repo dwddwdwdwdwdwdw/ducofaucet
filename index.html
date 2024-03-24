@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duino Coin Faucet</title>
+</head>
+<body>
+    <h1>Duino Coin (DUCO) Faucet</h1>
+    <label for="ducoUsername">Your Duino Coin Wallet Username:</label><br>
+    <input type="text" id="ducoUsername" name="ducoUsername"><br>
+    <button onclick="getDucos()">Get DUCO's</button><br>
+    <div id="result"></div>
+
+    <script>
+        function getDucos() {
+            var ducoUsername = document.getElementById("ducoUsername").value;
+            var faucetUsername = 'Sap0174';
+            var faucetPassword = 'Sassy0174';
+            var messageToSend = 'Thanks for using the faucet!';
+
+            // Retrieve balance
+            fetch(`https://server.duinocoin.com/balances/${faucetUsername}`)
+            .then(response => response.json())
+            .then(balanceData => {
+                var faucetBalance = balanceData.result.balance;
+
+                // Set percentage of balance to send
+                var percentToSend = 3.33;  // Example percentage
+
+                // Send DUCO to user
+                fetch(`https://server.duinocoin.com/transaction/?username=${faucetUsername}&password=${faucetPassword}&recipient=${ducoUsername}&amount=${percentToSend}&memo=${messageToSend}`)
+                .then(response => response.json())
+                .then(transactionData => {
+                    var transactionHash = transactionData.result.split(",")[2];  // Extract transaction hash
+                    var resultDiv = document.getElementById("result");
+                    resultDiv.innerHTML = `<p>${percentToSend} DUCO's sent to ${ducoUsername}. Transaction Hash: ${transactionHash}</p>`;
+                })
+                .catch(error => {
+                    console.error('Error sending DUCO:', error);
+                });
+            })
+            .catch(error => {
+                console.error('Error retrieving balance:', error);
+            });
+        }
+    </script>
+</body>
+</html>
